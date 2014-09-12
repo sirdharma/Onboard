@@ -65,10 +65,53 @@ static CGFloat const kMainPageControlHeight = 35;
     [self generateView];
 }
 
+- (void)viewDidLayoutSubviews {
+    [super viewDidLayoutSubviews];
+    
+    [self setFrames];
+}
+
 - (void)generateView {
     // we want our background to be clear so we can see through it to the image provided
     self.view.backgroundColor = [UIColor clearColor];
     
+    // create the image view with the appropriate image, size, and center in on screen
+    _imageView = [[UIImageView alloc] initWithImage:_image];
+    [self.view addSubview:_imageView];
+    
+    // create and configure the main text label sitting underneath the icon with the provided padding
+    _mainTextLabel = [UILabel new];
+    _mainTextLabel.text = _titleText;
+    _mainTextLabel.textColor = self.titleTextColor;
+    _mainTextLabel.font = [UIFont fontWithName:self.fontName size:self.titleFontSize];
+    _mainTextLabel.numberOfLines = 0;
+    _mainTextLabel.textAlignment = NSTextAlignmentCenter;
+    [self.view addSubview:_mainTextLabel];
+    
+    // create and configure the sub text label
+    _subTextLabel = [UILabel new];
+    _subTextLabel.text = _body;
+    _subTextLabel.textColor = self.bodyTextColor;
+    _subTextLabel.font = [UIFont fontWithName:self.fontName size:self.bodyFontSize];
+    _subTextLabel.numberOfLines = 0;
+    _subTextLabel.textAlignment = NSTextAlignmentCenter;
+    _subTextLabel.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
+    [self.view addSubview:_subTextLabel];
+    
+    // create the action button if we were given button text
+    if (_buttonText) {
+        _actionButton = [UIButton new];
+        _actionButton.titleLabel.font = [UIFont systemFontOfSize:24];
+        [_actionButton setTitle:_buttonText forState:UIControlStateNormal];
+        [_actionButton setTitleColor:self.buttonTextColor forState:UIControlStateNormal];
+        [_actionButton addTarget:self action:@selector(handleButtonPressed) forControlEvents:UIControlEventTouchUpInside];
+        [self.view addSubview:_actionButton];
+    }
+    
+    [self setFrames];
+}
+
+- (void)setFrames {
     // do some calculation for some common values we'll need, namely the width of the view,
     // the center of the width, and the content width we want to fill up, which is some
     // fraction of the view width we set in the multipler constant
@@ -76,41 +119,18 @@ static CGFloat const kMainPageControlHeight = 35;
     CGFloat horizontalCenter = viewWidth / 2;
     CGFloat contentWidth = viewWidth * kContentWidthMultiplier;
     
-    // create the image view with the appropriate image, size, and center in on screen
-    UIImageView *imageView = [[UIImageView alloc] initWithImage:_image];
-    [imageView setFrame:CGRectMake(horizontalCenter - (self.iconSize / 2), self.topPadding, self.iconSize, self.iconSize)];
-    [self.view addSubview:imageView];
+    _imageView.frame = CGRectMake(horizontalCenter - (self.iconSize / 2), self.topPadding, self.iconSize, self.iconSize);
     
-    // create and configure the main text label sitting underneath the icon with the provided padding
-    UILabel *mainTextLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, CGRectGetMaxY(imageView.frame) + self.underIconPadding, contentWidth, 0)];
-    mainTextLabel.text = _titleText;
-    mainTextLabel.textColor = self.titleTextColor;
-    mainTextLabel.font = [UIFont fontWithName:self.fontName size:self.titleFontSize];
-    mainTextLabel.numberOfLines = 0;
-    mainTextLabel.textAlignment = NSTextAlignmentCenter;
-    [mainTextLabel sizeToFit];
-    mainTextLabel.center = CGPointMake(horizontalCenter, mainTextLabel.center.y);
-    [self.view addSubview:mainTextLabel];
+    _mainTextLabel.frame = CGRectMake(0, CGRectGetMaxY(_imageView.frame) + self.underIconPadding, contentWidth, 0);
+    [_mainTextLabel sizeToFit];
+    _mainTextLabel.center = CGPointMake(horizontalCenter, _mainTextLabel.center.y);
     
-    // create and configure the sub text label
-    UILabel *subTextLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, CGRectGetMaxY(mainTextLabel.frame) + self.underTitlePadding, contentWidth, 0)];
-    subTextLabel.text = _body;
-    subTextLabel.textColor = self.bodyTextColor;
-    subTextLabel.font = [UIFont fontWithName:self.fontName size:self.bodyFontSize];
-    subTextLabel.numberOfLines = 0;
-    subTextLabel.textAlignment = NSTextAlignmentCenter;
-    [subTextLabel sizeToFit];
-    subTextLabel.center = CGPointMake(horizontalCenter, subTextLabel.center.y);
-    [self.view addSubview:subTextLabel];
+    _subTextLabel.frame = CGRectMake(0, CGRectGetMaxY(_mainTextLabel.frame) + self.underTitlePadding, contentWidth, 0);
+    [_subTextLabel sizeToFit];
+    _subTextLabel.center = CGPointMake(horizontalCenter, _subTextLabel.center.y);
     
-    // create the action button if we were given button text
-    if (_buttonText) {
-        UIButton *actionButton = [[UIButton alloc] initWithFrame:CGRectMake((CGRectGetMaxX(self.view.frame) / 2) - (contentWidth / 2), CGRectGetMaxY(self.view.frame) - kMainPageControlHeight - kActionButtonHeight - self.bottomPadding, contentWidth, kActionButtonHeight)];
-        actionButton.titleLabel.font = [UIFont systemFontOfSize:24];
-        [actionButton setTitle:_buttonText forState:UIControlStateNormal];
-        [actionButton setTitleColor:self.buttonTextColor forState:UIControlStateNormal];
-        [actionButton addTarget:self action:@selector(handleButtonPressed) forControlEvents:UIControlEventTouchUpInside];
-        [self.view addSubview:actionButton];
+    if (_actionButton) {
+        _actionButton.frame = CGRectMake((CGRectGetMaxX(self.view.frame) / 2) - (contentWidth / 2), CGRectGetMaxY(self.view.frame) - kMainPageControlHeight - kActionButtonHeight - self.bottomPadding, contentWidth, kActionButtonHeight);
     }
 }
 

@@ -52,6 +52,7 @@ static CGFloat const kDefaultSaturationDeltaFactor = 1.8;
     // create the background image view and set it to aspect fill so it isn't skewed
     UIImageView *backgroundImageView = [[UIImageView alloc] initWithFrame:self.view.bounds];
     backgroundImageView.contentMode = UIViewContentModeScaleAspectFill;
+    backgroundImageView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     [backgroundImageView setImage:_backgroundImage];
     [self.view addSubview:backgroundImageView];
     
@@ -60,9 +61,9 @@ static CGFloat const kDefaultSaturationDeltaFactor = 1.8;
     // darkens it a bit for better contrast
     UIView *backgroundMaskView;
     if (self.shouldMaskBackground) {
-        backgroundMaskView = [[UIView alloc] initWithFrame:_pageVC.view.frame];
+        backgroundMaskView = [[UIView alloc] initWithFrame:CGRectMake(-1000, -1000, 100000, 100000)];
         backgroundMaskView.backgroundColor = [UIColor colorWithWhite:0.0 alpha:kBackgroundMaskAlpha];
-        [_pageVC.view addSubview:backgroundMaskView];
+        [self.view addSubview:backgroundMaskView];
     }
     
     // more page controller setup
@@ -78,6 +79,13 @@ static CGFloat const kDefaultSaturationDeltaFactor = 1.8;
     _pageControl = [[UIPageControl alloc] initWithFrame:CGRectMake(0, CGRectGetMaxY(self.view.frame) - kPageControlHeight, self.view.frame.size.width, kPageControlHeight)];
     _pageControl.numberOfPages = _viewControllers.count;
     [self.view addSubview:_pageControl];
+}
+
+- (void)viewDidLayoutSubviews {
+    [super viewDidLayoutSubviews];
+    
+    // if the view rotates, reset the frame on the page control so it's still sitting on the bottom of the view
+    _pageControl.frame = CGRectMake(0, CGRectGetMaxY(self.view.frame) - kPageControlHeight, self.view.frame.size.width, kPageControlHeight);
 }
 
 

@@ -14,6 +14,11 @@
     UIImage *_image;
     NSString *_buttonText;
     dispatch_block_t _actionHandler;
+    
+    UIImageView *_imageView;
+    UILabel *_mainTextLabel;
+    UILabel *_subTextLabel;
+    UIButton *_actionButton;
 }
 
 @property (nonatomic) CGFloat iconSize;
