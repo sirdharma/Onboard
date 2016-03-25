@@ -42,7 +42,11 @@ NSString * const kOnboardActionButtonAccessibilityIdentifier = @"OnboardActionBu
 @implementation OnboardingContentViewController
 
 - (void)dealloc {
-    [[NSNotificationCenter defaultCenter] removeObserver:self forKeyPath:UIApplicationWillEnterForegroundNotification];
+    @try {
+        [[NSNotificationCenter defaultCenter] removeObserver:self forKeyPath:UIApplicationWillEnterForegroundNotification];
+    } @catch (NSException *exception) {
+    } @finally {
+    }
 }
 
 + (instancetype)contentWithTitle:(NSString *)title body:(NSString *)body image:(UIImage *)image buttonText:(NSString *)buttonText action:(dispatch_block_t)action {
